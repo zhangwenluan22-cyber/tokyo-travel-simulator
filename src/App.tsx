@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { SceneImage } from './components/SceneImage';
+import { buildUIImageSources, OptimizedImage, SceneImage } from './components/SceneImage';
 import { initialStats, lunchHubSceneId, lunchSpotSceneIds, scenes, tokyoHubSceneId, tokyoSpotSceneIds } from './data/gameData';
-import type { Choice, Gender, SelectedChoiceResult, Stats } from './types/game';
+import type { Choice, Gender, Scene, SelectedChoiceResult, Stats } from './types/game';
 
 type AppScreen = 'landing' | 'gender' | 'game';
 
@@ -30,6 +30,44 @@ function clampStat(value: number) {
 
 function formatDelta(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
+}
+
+function getSceneImagePath(baseName: string | undefined, gender: Gender | null) {
+  if (!baseName || !gender) {
+    return null;
+  }
+
+  const suffix = gender === 'female' ? '女' : '男';
+  return `/images/optimized/scenes/${baseName}_${suffix}.webp`;
+}
+
+function getSceneFallbackPath(baseName: string | undefined, gender: Gender | null) {
+  if (!baseName || !gender) {
+    return null;
+  }
+
+  const suffix = gender === 'female' ? '女' : '男';
+  return `/images/scenes/${baseName}_${suffix}.png`;
+}
+
+function collectPreloadSceneIds(scene: Scene, choices: Choice[]) {
+  if (scene.type === 'hub') {
+    return choices
+      .map((choice) => choice.nextSceneId)
+      .filter((sceneId): sceneId is string => Boolean(sceneId));
+  }
+
+  if (scene.type === 'narrative' && scene.nextSceneId) {
+    return [scene.nextSceneId];
+  }
+
+  if (scene.type === 'choice' || scene.type === 'random') {
+    return (scene.choices ?? [])
+      .map((choice) => choice.nextSceneId)
+      .filter((sceneId): sceneId is string => Boolean(sceneId));
+  }
+
+  return [];
 }
 
 function renderChoiceText(text: string) {
@@ -223,6 +261,29 @@ function App() {
 
     return currentScene.choices ?? [];
   }, [currentScene, visitedLunchSpots, visitedTokyoSpots]);
+
+  useEffect(() => {
+    if (screen !== 'game' || !gender) {
+      return;
+    }
+
+    const preloadSceneIds = collectPreloadSceneIds(currentScene, activeChoices);
+    const preloadPaths = Array.from(
+      new Set(
+        preloadSceneIds.flatMap((sceneId) => {
+          const scene = scenes[sceneId];
+          const optimizedPath = getSceneImagePath(scene?.imageBaseName, gender);
+          const fallbackPath = getSceneFallbackPath(scene?.imageBaseName, gender);
+          return [optimizedPath, fallbackPath].filter((path): path is string => Boolean(path));
+        }),
+      ),
+    );
+
+    preloadPaths.forEach((path) => {
+      const image = new Image();
+      image.src = path;
+    });
+  }, [activeChoices, currentScene, gender, screen]);
 
   const continueButtonLabel = useMemo(() => {
     if (currentScene.type === 'narrative' || currentScene.type === 'random') {
@@ -432,10 +493,18 @@ function App() {
           <p className="section-copy">先选一个旅行版本。后续场景会根据对应角色自动切换。</p>
           <div className="gender-grid">
             <button className="gender-card" onClick={() => handleGenderPick('female')}>
-              <img src="/images/ui/女生.png" alt="女生版" />
+              <OptimizedImage
+                optimizedSrc={buildUIImageSources('女生').optimizedSrc}
+                fallbackSrc={buildUIImageSources('女生').fallbackSrc}
+                alt="女生版"
+              />
             </button>
             <button className="gender-card" onClick={() => handleGenderPick('male')}>
-              <img src="/images/ui/男生.png" alt="男生版" />
+              <OptimizedImage
+                optimizedSrc={buildUIImageSources('男生').optimizedSrc}
+                fallbackSrc={buildUIImageSources('男生').fallbackSrc}
+                alt="男生版"
+              />
             </button>
           </div>
         </section>
