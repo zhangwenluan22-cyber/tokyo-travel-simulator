@@ -32,6 +32,13 @@ function formatDelta(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
+const statLabelMap: Record<keyof Stats, string> = {
+  money: '预算',
+  energy: '体力',
+  happiness: '快乐',
+  luck: '运气',
+};
+
 function getSceneImagePath(baseName: string | undefined, gender: Gender | null) {
   if (!baseName || !gender) {
     return null;
@@ -471,7 +478,6 @@ function App() {
     return (
       <main className="app-shell">
         <section className="phone-frame start-screen">
-          <div className="eyebrow">Mobile First Travel Game</div>
           <h1>日本旅游模拟器</h1>
           <p className="lead">
             一次轻松又有点手忙脚乱的东京旅行。边做选择，边学一点旅行日语。
@@ -488,7 +494,7 @@ function App() {
     return (
       <main className="app-shell">
         <section className="phone-frame">
-          <div className="eyebrow">Step 1</div>
+          <div className="eyebrow">第一步</div>
           <h2>选择角色</h2>
           <p className="section-copy">先选一个旅行版本。后续场景会根据对应角色自动切换。</p>
           <div className="gender-grid">
@@ -517,7 +523,7 @@ function App() {
       <section className="phone-frame">
         <header className="game-header">
           <div>
-            <div className="eyebrow">Tokyo Trip</div>
+            <div className="eyebrow">东京之旅</div>
             <h2>{currentScene.title}</h2>
           </div>
           <button className="ghost-button" onClick={restart}>
@@ -528,7 +534,7 @@ function App() {
         <div className="stats-panel">
           {Object.entries(stats).map(([key, value]) => (
             <div className="stat-chip" key={key}>
-              <span>{key}</span>
+              <span>{statLabelMap[key as keyof Stats]}</span>
               <strong>{value}</strong>
             </div>
           ))}
@@ -623,7 +629,7 @@ function App() {
                 ).map(([key, value]) =>
                   typeof value === 'number' ? (
                     <span key={key} className="effect-chip">
-                      {key} {formatDelta(value)}
+                      {statLabelMap[key as keyof Stats]} {formatDelta(value)}
                     </span>
                   ) : null,
                 )}
