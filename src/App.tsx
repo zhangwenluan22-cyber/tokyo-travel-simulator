@@ -208,8 +208,14 @@ function resolveHubChoices(visitedTokyoSpots: string[]): Choice[] {
     { id: 'go_ginza', text: visitedSet.has('ginza') ? '银座（已去过）' : '银座', nextSceneId: 'ginza', isNavigation: true },
   ];
 
+  const availableChoices = destinationChoices.filter((choice) => !visitedSet.has(choice.nextSceneId ?? ''));
+
+  if (visitedSet.size === 0) {
+    return availableChoices;
+  }
+
   return [
-    ...destinationChoices.filter((choice) => !visitedSet.has(choice.nextSceneId ?? '')),
+    ...availableChoices,
     {
       id: 'go_lunch',
       text: visitedSet.size === tokyoSpotSceneIds.length ? '差不多都玩到了，去吃午餐' : '差不多了，去吃午餐',
@@ -229,8 +235,14 @@ function resolveLunchChoices(visitedLunchSpots: string[]): Choice[] {
     { id: 'go_tonkatsu', text: '炸猪排店', nextSceneId: 'tonkatsu', isNavigation: true },
   ];
 
+  const availableChoices = restaurantChoices.filter((choice) => !visitedSet.has(choice.nextSceneId ?? ''));
+
+  if (visitedSet.size === 0) {
+    return availableChoices;
+  }
+
   return [
-    ...restaurantChoices.filter((choice) => !visitedSet.has(choice.nextSceneId ?? '')),
+    ...availableChoices,
     {
       id: 'go_cafe',
       text: visitedSet.size === lunchSpotSceneIds.length ? '吃得差不多了，去咖啡厅' : '吃饱了，去咖啡厅',
