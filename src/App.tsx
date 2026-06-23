@@ -478,6 +478,13 @@ function App() {
     return (
       <main className="app-shell">
         <section className="phone-frame start-screen">
+          <div className="landing-cover">
+            <img
+              src="/images/scenes/东京旅行模拟器海报.png"
+              alt="东京旅行模拟器封面海报"
+              className="landing-cover__img"
+            />
+          </div>
           <h1>日本旅游模拟器</h1>
           <p className="lead">
             一次轻松又有点手忙脚乱的东京旅行。边做选择，边学一点旅行日语。
