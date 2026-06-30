@@ -603,7 +603,7 @@ export const scenes: Record<string, Scene> = {
     title: '便利店篇',
     type: 'choice',
     imageBaseName: '便利店篇',
-    description: '夜深了，你想简单吃点热腾腾的宵夜。',
+    description: '夜深了，你在回酒店路上突然有点饿了，想简单吃点热腾腾的宵夜。',
     choices: [
       {
         id: 'oden',

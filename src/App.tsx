@@ -490,7 +490,7 @@ function App() {
     return (
       <main className="app-shell">
         <section className="phone-frame start-screen">
-          <h1>日本旅游模拟器</h1>
+          <h1>3分钟东京旅游模拟器</h1>
           <p className="lead">
             一次轻松又有点手忙脚乱的东京旅行。边做选择，边学一点旅行日语。
           </p>
